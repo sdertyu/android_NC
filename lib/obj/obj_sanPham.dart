@@ -5,7 +5,7 @@ class sanPham {
   late String _tenSP;
   late String _link;
   double _gia;
-  int _loai;
+  String _loai;
 
 
   sanPham(this._idSP,this._tenSP, this._link, this._gia, this._loai);
@@ -28,9 +28,9 @@ class sanPham {
     _gia = value;
   }
 
-  int get loai => _loai;
+  String get loai => _loai;
 
-  set loai(int value) {
+  set loai(String value) {
     _loai = value;
   }
 

@@ -19,7 +19,6 @@ class _cartState extends State<cart> {
   List<obj_sp_gh> listSP = [];
   double tongTien = 0;
 
-
   // List<String> options = ["Tiền mặt", "Chuyển khoản", "Thẻ tín dụng"];
   // List<String> listIcons = [
   //   "assets/images/cash_icon.png",
@@ -32,7 +31,7 @@ class _cartState extends State<cart> {
     {"title": "Chuyển khoản", "icon": "images/banking_icon.png"},
     {"title": "Thẻ tín dụng", "icon": "images/credit_card_icon.png"},
   ];
-  String? selectedValue;
+  late String selectedValue;
 
   // Future getListSP() async {
   //   try {
@@ -112,10 +111,71 @@ class _cartState extends State<cart> {
     return crc;
   }
 
+  Future<void> _showXanNhan() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Xác nhận thanh toán"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Row(
+                  children: [
+                    Text('Bạn đang chọn phương thức: '),
+                    Text(
+                      selectedValue,
+                      style: TextStyle(color: Colors.green, fontSize: 18),
+                    )
+                  ],
+                ),
+                Text('Bạn chắc chắn muốn thanh toán bằng hình thức này?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Chấp nhận'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: Container(
+                        width: 400,
+                        height: 400,
+                        child: Center(
+                          child: QrImageView(
+                            data:
+                                generateVcbQrData(amount: tongTien.toString()),
+                            version: QrVersions.auto,
+                            size: 400.0,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            TextButton(
+              child: const Text("Hủy"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
-    selectedValue = options.first['title'];
+    selectedValue = options.first['title']!;
     // getListSP();
   }
 
@@ -178,8 +238,8 @@ class _cartState extends State<cart> {
 
                       return GestureDetector(
                         child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 20),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -205,8 +265,9 @@ class _cartState extends State<cart> {
                                         fontWeight: FontWeight.w600),
                                   ),
                                   Text("topping: " + spgh.sTopping),
-                                  Text(
-                                      "Đá: " + (spgh.fDa * 100).toString() + "%"),
+                                  Text("Đá: " +
+                                      (spgh.fDa * 100).toString() +
+                                      "%"),
                                   Text("Đường: " +
                                       (spgh.fDuong * 100).toString() +
                                       "%")
@@ -262,14 +323,16 @@ class _cartState extends State<cart> {
                                 child: Text(
                                   formatNumber(spgh.fThanhTien) + " VNĐ",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w600, fontSize: 18),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18),
                                 ),
                               ),
 
                               Container(
                                 child: IconButton(
                                   onPressed: () async {
-                                    final remo = await FirebaseFirestore.instance
+                                    final remo = await FirebaseFirestore
+                                        .instance
                                         .collection("tblGioHang")
                                         .doc(spgh.id)
                                         .delete();
@@ -301,7 +364,7 @@ class _cartState extends State<cart> {
                   Row(
                     children: [
                       Container(
-                        margin: EdgeInsets.only(left: 30),
+                        margin: EdgeInsets.only(left: 100, top: 20),
                         child: DropdownButton<String>(
                           value: selectedValue,
                           icon: Icon(Icons.arrow_drop_down_rounded),
@@ -311,8 +374,8 @@ class _cartState extends State<cart> {
                             return DropdownMenuItem<String>(
                               value: item['title'],
                               child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 4),
-
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 3, horizontal: 4),
                                 child: Row(
                                   children: [
                                     Image.asset(item['icon'].toString()),
@@ -324,7 +387,7 @@ class _cartState extends State<cart> {
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
-                            selectedValue = newValue;
+                            selectedValue = newValue!;
                             print(selectedValue);
                           },
                         ),
@@ -336,20 +399,24 @@ class _cartState extends State<cart> {
                         padding: EdgeInsets.only(left: 40),
                         child: Text(
                           "Tổng tiền: ",
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 18),
                         ),
                       ),
                       Container(
                         padding: EdgeInsets.only(right: 60),
                         child: Text(
                           formatNumber(tongTien) + " VNĐ",
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 18),
                         ),
                       ),
                     ],
                   ),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _showXanNhan();
+                    },
                     color: Color(0xffDB4B4B),
                     child: Text(
                       "Thanh toán",
@@ -367,12 +434,9 @@ class _cartState extends State<cart> {
             //   version: QrVersions.auto,
             //   size: 200.0,
             // )
-
-
           ],
         ),
       ),
-
     );
   }
 }
