@@ -1,3 +1,5 @@
+import 'package:btl/obj/obj_khuyenMai.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class khuyenMai extends StatefulWidget {
@@ -8,6 +10,30 @@ class khuyenMai extends StatefulWidget {
 }
 
 class _khuyenMaiState extends State<khuyenMai> {
+
+  List<obj_khuyenMai> listKM = [];
+
+  Future getKM() async {
+    final result =
+        await FirebaseFirestore.instance.collection("tblKhuyenMai").get();
+    if(result.docs.isNotEmpty) {
+      result.docs.forEach((value) {
+        obj_khuyenMai km = obj_khuyenMai(value["sTen"], value["sLink"], value["sNoiDung"], value["dThoiGian"]);
+        listKM.add(km);
+      });
+    }
+    setState(() {
+
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    getKM();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,14 +53,14 @@ class _khuyenMaiState extends State<khuyenMai> {
       body: Column(
         children: [
           SizedBox(
-            height: 20,
+            height: 3,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.only(left: 30),
+                padding: EdgeInsets.only(left: 30, bottom: 7),
                 child: Row(
                   children: [
                     Image.asset(
@@ -54,24 +80,6 @@ class _khuyenMaiState extends State<khuyenMai> {
                   ],
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(right: 30),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.search,
-                      size: 35,
-                    ),
-                    SizedBox(
-                      width: 7,
-                    ),
-                    Icon(
-                      Icons.shopping_cart_outlined,
-                      size: 35,
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           Expanded(
@@ -79,25 +87,31 @@ class _khuyenMaiState extends State<khuyenMai> {
               padding: EdgeInsets.symmetric(horizontal: 50),
               child: CustomScrollView(
                 slivers: [
-                  SliverToBoxAdapter(
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Image.asset("assets/images/mixue_logo.jpg"),
+                  if(listKM.length > 0) ...[
+                    SliverToBoxAdapter(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 10),
+
+                        child: Image.network(listKM[0].link),
+                      ),
                     ),
-                  ),
+                  ],
+
                   SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      return Image.asset(
-                        "assets/images/mixue_logo.jpg",
-                        height: 50,
+                      return Image.network(
+                        listKM[index + 1].link,
+                        // height: 50,
                         fit: BoxFit.cover,
                       );
-                    }, childCount: 4),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 1.0),
+                    }, childCount: listKM.length -1),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        // crossAxisCount: 2,
+                        maxCrossAxisExtent: 500,
+                        mainAxisSpacing: 30,
+                        crossAxisSpacing: 30,
+
+                        childAspectRatio: 1),
                   ),
                 ],
               ),
