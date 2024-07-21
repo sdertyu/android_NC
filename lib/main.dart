@@ -6,8 +6,9 @@ import 'package:btl/pages/menu.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   if (kIsWeb) {
@@ -23,6 +24,7 @@ void main() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
   }
+  // await dotenv.load(fileName: ".env");
 
   runApp(khoiTao());
 }
@@ -40,7 +42,8 @@ class khoiTao extends StatelessWidget {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  static final GlobalKey<_MyAppState> globalKey = GlobalKey();
+  MyApp() : super(key: globalKey);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -48,7 +51,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   static const List<Widget> _listPage = [menu(), khuyenMai(), cart()];
-  int currentIndex = 0;
+   int currentIndex = 0;
+
+  void navigateToPage(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

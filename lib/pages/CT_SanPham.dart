@@ -19,11 +19,12 @@ class _CT_SanPhamState extends State<CT_SanPham> {
   List<bool> topping = [];
   List<String> topp_name = ["Trân châu", "thạch đào", "thạch dừa", "lô hội"];
   List<sanPham> listTP = [];
-  double ice = 0;
-  double sugar = 0;
+  double ice = 1;
+  double sugar = 1;
   int sl = 1;
   double gia = 0;
-  TextEditingController _controller = TextEditingController();
+  TextEditingController _controller_GC = TextEditingController();
+  TextEditingController _controller_SL = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _CT_SanPhamState extends State<CT_SanPham> {
       widget.listTP.length,
       (index) => false,
     );
+    _controller_SL.text = sl.toString();
     gia = sp.gia;
     setState(() {});
   }
@@ -54,7 +56,6 @@ class _CT_SanPhamState extends State<CT_SanPham> {
         } else
           topp += topp_name[i];
       }
-
     }
     // String topping =
     Map<String, dynamic> data = {
@@ -64,12 +65,45 @@ class _CT_SanPhamState extends State<CT_SanPham> {
       "fDa": ice,
       "fDuong": sugar,
       "sTopping": topp,
-      "sGhiChu": _controller.text,
+      "sGhiChu": _controller_GC.text,
       "fThanhTien": gia,
-      "fGiaGoc": sp.gia + tp*3000,
+      "fGiaGoc": sp.gia + tp * 3000,
     };
     final add =
         await FirebaseFirestore.instance.collection("tblGioHang").add(data);
+    _showXacNhan();
+  }
+
+  Future<void> _showXacNhan() {
+    DateTime now = DateTime.now();
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(
+          Duration(seconds: 1),
+          () {
+            Navigator.of(context).pop();
+          },
+        );
+        return AlertDialog(
+            backgroundColor: Colors.grey.withOpacity(0.4),
+            title: Column(
+              children: [
+                Icon(
+                  Icons.check_box_outlined,
+                  size: 100,
+                  color: Colors.green.withOpacity(0.9),
+                ),
+                Text(
+                  "Đã thêm sản phẩm vào giỏ hàng",
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                )
+              ],
+            ));
+      },
+    );
   }
 
   @override
@@ -324,9 +358,9 @@ class _CT_SanPhamState extends State<CT_SanPham> {
                                         ),
                                       ],
                                     ),
-                                  ], 
+                                  ],
                                 ),
-                              ), 
+                              ),
                               Container(
                                 width: size.width * 0.45 * 0.5,
                                 child: Column(
@@ -427,7 +461,7 @@ class _CT_SanPhamState extends State<CT_SanPham> {
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: 30),
                                 child: TextField(
-                                  controller: _controller,
+                                  controller: _controller_GC,
                                   decoration: InputDecoration(
                                       // label: Text("Nhập tại đây"),
                                       hintText: "Nhập tại đây",
@@ -467,32 +501,53 @@ class _CT_SanPhamState extends State<CT_SanPham> {
                                   onPressed: () {
                                     if (sl > 1) {
                                       int tp = 0;
-                                      for(int i=0; i<topping.length; i++)
-                                        {
-                                          if(topping[i] == true) {
-                                            tp++;
-                                          }
+                                      for (int i = 0; i < topping.length; i++) {
+                                        if (topping[i] == true) {
+                                          tp++;
                                         }
+                                      }
                                       sl--;
-                                      gia -= (sp.gia + 3000*tp);
+                                      gia -= (sp.gia + 3000 * tp);
+                                      _controller_SL.text = sl.toString();
 
                                       setState(() {});
                                     }
                                   },
                                   icon: Icon(Icons.remove_circle),
                                 ),
-                                Text(sl.toString()),
+                                Container(
+                                  width: 25,
+                                  child: TextField(
+                                    textAlign: TextAlign.center,
+                                    controller: _controller_SL,
+                                    decoration: InputDecoration(),
+                                    onChanged: (value) {
+                                      sl = int.parse(value);
+                                      if (sl > 1) {
+                                        int tp = 0;
+                                        for (int i = 0; i < topping.length; i++) {
+                                          if (topping[i] == true) {
+                                            tp++;
+                                          }
+                                        }
+                                        gia = (sp.gia * sl + 3000 * tp);
+
+                                      }
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
                                 IconButton(
                                   onPressed: () {
                                     int tp = 0;
-                                    for(int i=0; i<topping.length; i++)
-                                    {
-                                      if(topping[i] == true) {
+                                    for (int i = 0; i < topping.length; i++) {
+                                      if (topping[i] == true) {
                                         tp++;
                                       }
                                     }
                                     sl++;
-                                    gia += sp.gia + 3000*tp;
+                                    gia += sp.gia + 3000 * tp;
+                                    _controller_SL.text = sl.toString();
                                     setState(() {});
                                   },
                                   icon: Icon(Icons.add_circle),

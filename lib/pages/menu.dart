@@ -26,18 +26,21 @@ class _menuState extends State<menu> {
       if (result.docs.isNotEmpty) {
         int count = 0;
         result.docs.forEach((value) {
-          if (value["sLoai"] != "topping") {
+
+          if (value["sLoai"].toString() != "topping") {
+
             sanPham sp = new sanPham(value.id, value["sTenSP"], value["sLink"],
-                value["fGia"], value["sLoai"]);
+                value["fGia"].toDouble(), value["sLoai"]);
 
             if (!tieuDe.contains(value["sLoai"])) {
               tieuDe.add(value["sLoai"]);
             }
 
             _listALL.add(sp);
-          } else {
+          }
+          else {
             sanPham sp = new sanPham(value.id, value["sTenSP"], value["sLink"],
-                value["fGia"], value["sLoai"]);
+                value["fGia"].toDouble(), value["sLoai"]);
             _listTP.add(sp);
           }
         });
@@ -45,7 +48,7 @@ class _menuState extends State<menu> {
       _listSP = _listALL;
       setState(() {});
     } catch (e) {
-      print(e.toString() + "ERROR");
+      print(e);
     }
   }
 
@@ -196,7 +199,7 @@ class _menuState extends State<menu> {
                                 //   height: 10,
                                 // ),
                                 Text(
-                                  _listSP[index].gia.toString() + " VNĐ",
+                                  _listSP[index].gia.toStringAsFixed(0) + " VNĐ",
                                   style: TextStyle(
                                       fontSize: 27,
                                       fontWeight: FontWeight.w700,

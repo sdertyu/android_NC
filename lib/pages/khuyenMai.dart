@@ -104,7 +104,7 @@ class _khuyenMaiState extends State<khuyenMai> {
                         // height: 50,
                         fit: BoxFit.cover,
                       );
-                    }, childCount: listKM.length -1),
+                    }, childCount: listKM.length > 0 ? listKM.length -1 : 0),
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                         // crossAxisCount: 2,
                         maxCrossAxisExtent: 500,
