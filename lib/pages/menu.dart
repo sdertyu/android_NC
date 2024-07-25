@@ -135,7 +135,7 @@ class _menuState extends State<menu> {
                           onPressed: () {
                             showSearch(
                               context: context,
-                              delegate: CustomSearch(_listSP, _listTP),
+                              delegate: CustomSearch(_listALL, _listTP),
                             );
                           },
                           icon: Icon(
@@ -253,6 +253,7 @@ class CustomSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
+
     List<sanPham> matchQuery = [];
 
     for (var fruit in _listSP) {
@@ -267,22 +268,29 @@ class CustomSearch extends SearchDelegate {
       itemCount: matchQuery.length,
       itemBuilder: (context, index) {
         // var result = matchQuery[index];
-        return Container(
-          child: Row(
-            children: [
-              SizedBox(
-                width: 70,
-              ),
-              Image.network(
-                matchQuery[index].link,
-                height: 70,
-                fit: BoxFit.cover,
-              ),
-              SizedBox(
-                width: 40,
-              ),
-              Text(matchQuery[index].tenSP)
-            ],
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return CT_SanPham(sp: matchQuery[index], listTP: _listTP);
+            }));
+          },
+          child: Container(
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 70,
+                ),
+                Image.network(
+                  matchQuery[index].link,
+                  height: 70,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(
+                  width: 40,
+                ),
+                Text(matchQuery[index].tenSP)
+              ],
+            ),
           ),
         );
       },

@@ -24,7 +24,7 @@ class _cartState extends State<cart> {
   double tongTien = 0;
   int secondsLeft = 0;
   String MaHD = "";
-   // Thay bằng URL thực tế của MB Bank
+
 
   @override
   void initState() {
